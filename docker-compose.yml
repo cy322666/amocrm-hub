@@ -1,0 +1,42 @@
+version: '3.5'
+services:
+    app:
+        build: ./docker
+        volumes:
+            - ./application:/app
+        ports:
+            - "8001:8000"
+        links:
+            - postgresql
+            - supervisor
+        networks:
+             - network
+    postgresql:
+        image: postgres:9.6.21-alpine
+        ports:
+            - "5432:5432"
+        networks:
+            - network
+        volumes:
+            - ./database:/var/lib/postgresql
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: jdasfjnkk3HJSD
+            POSTGRES_DB: postgresql
+        restart: always
+
+    supervisor:
+        build: ./docker/supervisor
+        restart: unless-stopped
+        volumes:
+            - ./application:/app
+        ports:
+            - "8008:8008"
+        networks:
+            - network
+networks:
+    network:
+        name: network
+        external: true
+        driver: bridge
+
