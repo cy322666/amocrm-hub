@@ -20,7 +20,7 @@ RUN apt install php8.0-pgsql -y \
 
 #RUN systemctl status php8.0-fpm start
 
-COPY /* /etc/supervisor/conf.d/*
+COPY / /etc/supervisor/conf.d/
 #COPY worker.conf /etc/supervisor/conf.d/worker.conf
 
 EXPOSE 8008
