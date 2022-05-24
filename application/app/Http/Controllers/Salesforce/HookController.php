@@ -21,14 +21,20 @@ class HookController extends Controller
     {
         Log::info(__METHOD__, $request->toArray());
 
-        $hook = Hook::query()->create($request->toArray());
+        try {
+            $hook = Hook::query()->create($request->toArray());
 
-        $amoApi = $client->getInstance(Account::query()
-            ->where('name', 'amocrm')
-            ->first()
-        );
+            $amoApi = $client->getInstance(Account::query()
+                ->where('name', 'amocrm')
+                ->first()
+            );
 
-        (new SalesforceHookSender($hook, $amoApi))->send();
+            (new SalesforceHookSender($hook, $amoApi))->send();
+
+        } catch (\Exception $exception) {
+
+            Log::error(__METHOD__.' : '.$exception->getMessage());
+        }
 
         return response([
             'code'   => 200,
