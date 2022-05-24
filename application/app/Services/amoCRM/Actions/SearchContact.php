@@ -27,10 +27,11 @@ abstract class SearchContact
                     (new ContactsFilter())->setQuery($search_query)
                 )->first();
 
-        } catch (AmoCRMApiNoContentException|AmoCRMoAuthApiException|AmoCRMApiException $exception) {
+        } catch (AmoCRMoAuthApiException|AmoCRMApiException $exception) {
 
             Log::error(__METHOD__.' : '.$exception->getMessage());
         }
+        return null;
     }
 
     /**
