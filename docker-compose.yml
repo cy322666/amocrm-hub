@@ -8,7 +8,7 @@ services:
             - "8001:8000"
         links:
             - postgresql
-            - supervisor
+            - crontab
         networks:
              - network
     postgresql:
@@ -24,16 +24,6 @@ services:
             POSTGRES_PASSWORD: jdasfjnkk3HJSD
             POSTGRES_DB: postgresql
         restart: always
-
-    supervisor:
-        build: ./docker/supervisor
-        restart: unless-stopped
-        volumes:
-            - ./application:/app
-        ports:
-            - "8008:8008"
-        networks:
-            - network
 networks:
     network:
         name: network
