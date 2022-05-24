@@ -51,7 +51,7 @@ class HookController extends Controller
 
         Log::info(__METHOD__, $request->toArray());
 
-        $leadId   = $request->toArray()['leads']['status'][0]['lead_id'];
+        $leadId   = $request->toArray()['leads']['status'][0]['id'];
         $statusId = $request->toArray()['leads']['status'][0]['status_id'];
 
         $hook = Hook::query()
