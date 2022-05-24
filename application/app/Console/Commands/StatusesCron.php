@@ -53,7 +53,7 @@ class StatusesCron extends Command
 
                 Status::query()->create([
                     'status_id'   => $status->id,
-                    'status_name' => $status->name,
+                    'status_name' => mb_strtolower($status->name),
                 ]);
             }
         } catch (AmoCRMApiException $exception) {
