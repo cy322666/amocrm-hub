@@ -8,7 +8,6 @@ services:
             - "8001:8000"
         links:
             - postgresql
-            - crontab
         networks:
              - network
     postgresql:
