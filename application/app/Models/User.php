@@ -50,7 +50,7 @@ class User extends Authenticatable
         $payload = [
             'iat' => $time,
             'nbf' => $time,
-            'exp' => $time + 7200,
+            'exp' => $time + 21600,
             'data' => [
                 'id' => $this->id,
                 'username' => $this->email,
