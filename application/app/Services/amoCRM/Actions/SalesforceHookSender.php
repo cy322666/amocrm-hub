@@ -7,11 +7,8 @@ use AmoCRM\Collections\CustomFieldsValuesCollection;
 use AmoCRM\Collections\LinksCollection;
 use AmoCRM\Collections\TagsCollection;
 use AmoCRM\Exceptions\AmoCRMApiErrorResponseException;
-use AmoCRM\Exceptions\AmoCRMApiException;
 use AmoCRM\Exceptions\AmoCRMMissedTokenException;
-use AmoCRM\Exceptions\AmoCRMoAuthApiException;
 use AmoCRM\Models\ContactModel;
-use AmoCRM\Models\CustomFields\TextCustomFieldModel;
 use AmoCRM\Models\CustomFieldsValues\CheckboxCustomFieldValuesModel;
 use AmoCRM\Models\CustomFieldsValues\TextCustomFieldValuesModel;
 use AmoCRM\Models\CustomFieldsValues\ValueCollections\CheckboxCustomFieldValueCollection;
@@ -20,9 +17,8 @@ use AmoCRM\Models\CustomFieldsValues\ValueModels\CheckboxCustomFieldValueModel;
 use AmoCRM\Models\CustomFieldsValues\ValueModels\TextCustomFieldValueModel;
 use AmoCRM\Models\LeadModel;
 use AmoCRM\Models\TagModel;
-use App\Services\amoCRM\Client;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Octane\Exceptions\DdException;
+use Illuminate\Support\Facades\Log;
 
 class SalesforceHookSender
 {
@@ -35,11 +31,25 @@ class SalesforceHookSender
         $this->amoApi = $amoApi;
     }
 
-    public function send() : LeadModel
+    public function send()
     {
         $this->hook->contact_id = $this->updateOrCreateContact()->getId();
-        $this->hook->lead_id    = $this->createLead()->getId();
-        $this->hook->is_send    = true;
+
+        $leadId = $this->createLead();
+
+        if ($leadId) {
+
+            $this->hook->lead_id   = $leadId;
+
+            $lead = $this->amoApi->leads()->getOne($leadId);
+
+            $this->hook->status_id   = $lead->getStatusId();
+            $this->hook->pipeline_id = $lead->getPipelineId();
+            $this->hook->is_send = true;
+
+        } else {
+            Log::error(__METHOD__.' lead no created ');
+        }
         $this->hook->save();
     }
 
@@ -70,6 +80,16 @@ class SalesforceHookSender
 
         $customFields = $contact->getCustomFieldsValues();
 
+        //avito.position
+        $fieldValue = new TextCustomFieldValuesModel();
+        $fieldValue->setFieldId(48261);
+        $fieldValue->setValues(
+            (new TextCustomFieldValueCollection())
+                ->add((new TextCustomFieldValueModel())
+                    ->setValue($this->hook->position))
+        );
+        $customFields->add($fieldValue);
+
         if ($this->hook->phone && empty($customFields->getBy('fieldCode', 'PHONE'))) {
 
             SearchContact::setPhone($customFields, $this->hook->phone);
@@ -79,8 +99,7 @@ class SalesforceHookSender
 
             SearchContact::setEmail($customFields, $this->hook->email);
         }
-//        $contact->setCreatedBy(0);
-//        $contact->setUpdatedBy(0);
+
         try {
             return $this->amoApi
                 ->contacts()
@@ -92,7 +111,7 @@ class SalesforceHookSender
         }
     }
 
-    private function createLead() : LeadModel
+    private function createLead() : int
     {
         $lead = (new LeadModel())
             ->setName($this->hook->company)
@@ -108,16 +127,6 @@ class SalesforceHookSender
             (new CheckboxCustomFieldValueCollection())
                 ->add((new CheckboxCustomFieldValueModel())
                     ->setValue(true))
-        );
-        $leadCustomFieldsValues->add($fieldValue);
-
-        //avito.position
-        $fieldValue = new TextCustomFieldValuesModel();
-        $fieldValue->setFieldId(48261);
-        $fieldValue->setValues(
-            (new TextCustomFieldValueCollection())
-                ->add((new TextCustomFieldValueModel())
-                    ->setValue($this->hook->position))
         );
         $leadCustomFieldsValues->add($fieldValue);
 
@@ -152,7 +161,7 @@ class SalesforceHookSender
         $leadCustomFieldsValues->add($fieldValue);
 
         $lead->setCustomFieldsValues($leadCustomFieldsValues);
-
+//        dd($lead->getCustomFieldsValues());
         $lead->setTags((new TagsCollection())
             ->add(
                 (new TagModel())->setName('Авито')
@@ -170,11 +179,11 @@ class SalesforceHookSender
 
             $this->amoApi->leads()->link($lead, $links);
 
-            return $lead;
+            return $lead->getId();
 
-        } catch (AmoCRMApiException $exception) {
+        } catch (AmoCRMApiErrorResponseException $exception) {
 
-            dd(__METHOD__, $exception->getMessage());
+            dd(__METHOD__, $exception->getMessage() . ' ' . $exception->getDescription(), print_r($exception->getValidationErrors()) ?? []);
         }
     }
 }

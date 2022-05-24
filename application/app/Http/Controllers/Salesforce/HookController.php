@@ -44,15 +44,19 @@ class HookController extends Controller
 
     public function amocrm(Request $request)
     {
-        if ($request->toArray()['leads']['status'][0]['pipeline_id'] !== env('AMOCRM_PIPELINE_ID')) {
+        $requestData = $request->toArray();
+
+        if ($requestData['leads']['status'][0]['pipeline_id'] !== env('AMOCRM_PIPELINE_ID')) {
+
+            Log::alert(__METHOD__.' : pipeline != '.env('AMOCRM_PIPELINE_ID').' lead id '.$requestData['leads']['status'][0]['id']);
 
             return;
         }
 
         Log::info(__METHOD__, $request->toArray());
 
-        $leadId   = $request->toArray()['leads']['status'][0]['id'];
-        $statusId = $request->toArray()['leads']['status'][0]['status_id'];
+        $leadId   = $requestData['leads']['status'][0]['id'];
+        $statusId = $requestData['leads']['status'][0]['status_id'];
 
         $hook = Hook::query()
             ->where('lead_id', $leadId)
