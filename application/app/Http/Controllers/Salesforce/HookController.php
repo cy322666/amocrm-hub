@@ -31,7 +31,7 @@ class HookController extends Controller
 
             (new SalesforceHookSender($hook, $amoApi))->send();
 
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
 
             Log::error(__METHOD__.' : '.$exception->getMessage());
         }
