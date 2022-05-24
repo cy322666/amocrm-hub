@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
  */
 abstract class SearchContact
 {
-    public static function searchContact(AmoCRMApiClient $apiClient, string $search_query): ?ContactModel
+    public static function searchContact(AmoCRMApiClient $apiClient, string $search_query)
     {
         try {
             return $apiClient->contacts()
@@ -31,7 +31,6 @@ abstract class SearchContact
 
             Log::error(__METHOD__.' : '.$exception->getMessage());
         }
-        return null;
     }
 
     /**
