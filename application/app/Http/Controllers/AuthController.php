@@ -14,6 +14,11 @@ class AuthController extends Controller
             ->where('password', $request->password)
             ->first();
 
+        if (!$user) {
+
+            return response()->json(['error' => 'user not found']);
+        }
+
         $user->token = $user->getJWTToken();
         $user->save();
 
