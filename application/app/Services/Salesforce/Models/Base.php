@@ -38,9 +38,8 @@ class Base
      */
     public function update(array $params): string
     {
-        $response = $this->http->request('POST', self::$baseUrl.'services/apexrest/gigant', [
+        Log::info(__METHOD__, [
             'headers' => [
-//                'Content-type'  => 'application/json',
                 'Authorization' => 'Bearer '.$this->account->access_token,
             ],
             'json' => [
@@ -51,7 +50,7 @@ class Base
             ]
         ]);
 
-        Log::info(__METHOD__, [
+        $response = $this->http->request('POST', self::$baseUrl.'services/apexrest/gigant', [
             'headers' => [
 //                'Content-type'  => 'application/json',
                 'Authorization' => 'Bearer '.$this->account->access_token,
