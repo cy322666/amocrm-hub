@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UuidMiddleware
 {
@@ -19,6 +20,7 @@ class UuidMiddleware
         if ($request->uuid == env('UUID_SECRET')) {
 
             return $next($request);
-        }
+        } else
+            Log::alert(__METHOD__.' : uuid for amocrm invalid');
     }
 }
