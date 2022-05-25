@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class JWTMiddleware
 {
@@ -21,13 +22,15 @@ class JWTMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $jwt = $request->header('Token');
+        $jwt = $request->bearerToken();
         $key = env('JWT_SECRET');
 
         try {
             JWT::decode($jwt, new Key($key, 'HS256'));
 
         } catch (\Throwable $exception) {
+
+            Log::alert(__METHOD__.' : '.$exception->getMessage());
 
             return response()->json([
                 'error' => 'token invalid'
