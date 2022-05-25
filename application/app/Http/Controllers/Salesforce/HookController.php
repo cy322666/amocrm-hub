@@ -22,7 +22,17 @@ class HookController extends Controller
         Log::info(__METHOD__, $request->toArray());
 
         try {
-            $hook = Hook::query()->create($request->toArray());
+            $hook = Hook::query()->create([
+                "company"   => $request->company,
+                "phone"     => $request->phone,
+                "email"     => $request->email,
+                "manager"   => $request->manager,
+                "salesforce_id" => $request->salesforceId,
+                "comment"   => $request->comment,
+                "email_manager" => $request->email_manager,
+                "name"      => $request->name,
+                "position"  => $request->position,
+            ]);
 
             $amoApi = $client->getInstance(Account::query()
                 ->where('name', 'amocrm')
