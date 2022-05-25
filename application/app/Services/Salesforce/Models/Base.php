@@ -37,7 +37,7 @@ class Base
      * @throws GuzzleException
      */
     public function update(array $params): string
-    {ф
+    {
         Log::info(__METHOD__, [
             'headers' => [
                 'Authorization' => 'Bearer '.$this->account->access_token,
