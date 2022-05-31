@@ -12,7 +12,7 @@ class Auth
 {
     public static function refresh_access(Account &$account, $http): bool|string
     {
-        $response = $http->request('POST', 'https://avito--test.my.salesforce.com/services/oauth2/token', [
+        $response = $http->request('POST', 'https://login.salesforce.com/services/oauth2/token', [
             'headers' => [
                 'Content-type'  => 'application/x-www-form-urlencoded',
             ],
