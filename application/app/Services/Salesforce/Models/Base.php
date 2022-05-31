@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class Base
 {
-    protected static string $baseUrl = 'https://avito--test.my.salesforce.com/';
+    protected static string $baseUrl = 'https://avito.lightning.force.com/services/apexrest/gigant/';
 
     public Client $http;
     public $account;
